@@ -11,6 +11,7 @@ function App() {
   const [porukaPretrage, setPorukaPretrage] = useState('')
   const [predmet, setPredmet] = useState('')
   const [token, setToken] = useState('')
+  const [istorija, setIstorija] = useState([])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -34,6 +35,21 @@ function App() {
       setGreska(data.poruka)
     }
   }
+  const handleIstorija = async () => {
+  const response = await fetch('https://masdoc.fon.bg.ac.rs/api/istorija.php', {
+    headers: {
+      'Authorization': token,
+    },
+  })
+
+  const data = await response.json()
+
+  if (data.uspesno) {
+    setIstorija(data.zapisi)
+  }
+
+  setEkran('istorija')
+}
 
   const handlePretraga = async (e) => {
     e.preventDefault()
@@ -94,6 +110,7 @@ function App() {
       <div>
         <h1>MASdoc</h1>
         <button onClick={() => setEkran('login')}>Излаз</button>
+        <button onClick={handleIstorija}>Историја</button>
         <br /><br />
         <button>Пракса и приступни</button>
         <button>ОМОТ CD</button>
@@ -220,7 +237,38 @@ function App() {
       </div>
     )
   }
+  if (ekran === 'istorija') {
+    return (
+      <div>
+        <h1>Историја</h1>
+        <button onClick={() => setEkran('meni')}>← Назад</button>
+        <br /><br />
 
+        <table border="1" cellPadding="8">
+          <thead>
+            <tr>
+              <th>Корисник</th>
+              <th>Тип документа</th>
+              <th>Студент</th>
+              <th>Индекс</th>
+              <th>Датум</th>
+            </tr>
+          </thead>
+          <tbody>
+            {istorija.map((z) => (
+              <tr key={z.id}>
+                <td>{z.korisnik}</td>
+                <td>{z.tip_dokumenta}</td>
+                <td>{z.student_ime} {z.student_prezime}</td>
+                <td>{z.student_indeks}</td>
+                <td>{z.datum}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
   return (
     <div>
       <h1>MASdoc</h1>
